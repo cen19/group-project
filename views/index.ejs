@@ -25,14 +25,14 @@
             <h1>New York Times Article Search</h1>
             <p>Search for articles on a given date</p>
         </div>
-       
-       <div ng-repeat="date in dates">
-        // <ng-show "dates.year" {{dates.year}} </ng-show>
-        <ng-show="date.month"> {{date.month}} </ng-show>
+       <div ng-repeat="date in dates | limitTo: maxLimit">
+
+         {{date.year}}/{{date.month}}/{{date.day}}
+         
         </div>
         
         <form ng-submit="addDate()" 
-         style = "margin-top:30px;">
+         style = "margin-top:30px">
 
             <h3>Input a date</h3>
            
@@ -56,35 +56,7 @@
             </div>
             <button type="submit" class="btn btn-primary">Retrieve articles</button>
        </form>
-       
        </script>
-       
-       
-       <div class="input-group search-bar">
-        <input type="text" 
-         ng-model="search" 
-         ng-change="change()"
-         placeholder="Enter Date YearMonthDay(20001225)" />
-  ...
-</div>
-
-<div id="main-info" 
-     ng-include="'partials/main-info.html'">
-</div>
-
-<div id="related-results" 
-     ng-include="'partials/related-results.html'">
-</div>
-
     
-    <!--<div ng-chart="simple_table">-->
-    <!--    <div ng-controller="ChartController">-->
-    <!--        <div id="chart_div">-->
-    <!--            Chart Here-->
-    <!--        </div>-->
-    <!--        </div>-->
-    <!--    </div>-->
-    <!--</ng-app>-->
-    <!--</body>-->
 </body>
 </html>
