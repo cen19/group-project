@@ -39,38 +39,37 @@ app.config([
     }
 ]);
 
-app.controller('dataController', function($scope, $http){
-    var pendingTask;
+// app.controller('dataController', function($scope, $http){
+//     var pendingTask;
      
-     if($scope.search === undefined){
-      $scope.search = "20101010";
-      fetch();
-    }
+//      if($scope.search === undefined){
+//       $scope.search = "20101010";
+//       fetch();
+//     }
 
-    $scope.change = function(){
-      if(pendingTask){
-        clearTimeout(pendingTask);
-      }
-      pendingTask = setTimeout(fetch, 800);
-    };
+//     $scope.change = function(){
+//       if(pendingTask){
+//         clearTimeout(pendingTask);
+//       }
+//       pendingTask = setTimeout(fetch, 800);
+//     };
 
-    function fetch(){
-                $http.get("http://api.nytimes.com/svc/search/v2/articlesearch.json?callback=svc_search_v2_articlesearch&begin_date=" + $scope.search + "&end_date=" +
-                $scope.search + "&api-key=1e2c9c9b5e282dd8b3fb7a2ab7ee15e6%3A19%3A73419027")
-            .success(function(response) {
-                $scope.details = response;
-            });
-    }
+//     function fetch(){
+//             $http.get("http://api.nytimes.com/svc/search/v2/articlesearch.json?callback=svc_search_v2_articlesearch&begin_date=20101010&end_date=20101010&api-key=1e2c9c9b5e282dd8b3fb7a2ab7ee15e6%3A19%3A73419027")
+//             .success(function(response) {
+//                 $scope.details = response;
+//             });
+//     }
 
-    $scope.update = function(movie){
-      $scope.search = movie.Title;
-      $scope.change();
-    };
+//     $scope.update = function(movie){
+//       $scope.search = movie.Title;
+//       $scope.change();
+//     };
 
-    $scope.select = function(){
-      this.setSelectionRange(0, this.value.length);
-    };
-  });
+//     $scope.select = function(){
+//       this.setSelectionRange(0, this.value.length);
+//     };
+//   });
 
 app.controller('MainCtrl', [
     '$scope',
@@ -95,7 +94,16 @@ app.controller('MainCtrl', [
         };
         $scope.userDate = $scope.year+$scope.month+$scope.day;
     }]);
-    
+
+
+
+app.controller('DataController', ['$scope', 'Resource',
+  function($scope, Resource) {
+    console.log('controller');
+    console.log(Resource);
+  }
+]);
+// app.controller('DataCtrl', )  
 // app.controller('DataCtrl', function($scope,$http) {
     
 //     if($scope.dates===undefined){
@@ -179,6 +187,30 @@ app.factory('dates', ['$http', function($http) {
     return o;
 
 }]);
+
+
+app.run(['$http', '$rootScope',
+    function($http, $rootScope) {
+      console.log('Run');
+      $http.get('https://api.nytimes.com/svc/search/v2/articlesearch.json?callback=svc_search_v2_articlesearch&begin_date=20101010&end_date=20101010&api-key=1e2c9c9b5e282dd8b3fb7a2ab7ee15e6%3A19%3A73419027')
+        .success(function(data) {
+          $rootScope.resource = data;
+          console.log($rootScope.resource);
+        });
+    }
+  ])
+// app.factory('MasterData', ['$rootScope', '$http', '$q', '$log', 
+//     function($rootScope, $http, $q, $log) {
+
+//     var responseData;
+//     $http.get('http://api.nytimes.com/svc/search/v2/articlesearch.json?callback=svc_search_v2_articlesearch&begin_date=20101010&end_date=20101010&api-key=1e2c9c9b5e282dd8b3fb7a2ab7ee15e6%3A19%3A73419027').then(function (response) {
+//         responseData = response.data;
+//         console.log(response.data);
+//     });
+
+//     return responseData;
+
+// }]);
 
 
 
