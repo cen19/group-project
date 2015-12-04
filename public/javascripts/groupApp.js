@@ -17,7 +17,6 @@ app.config([
                 url: '/home',
                 templateUrl: '/home.html',
                 controller: 'MainCtrl',
-                controller1: 'DataCtrl',
                 resolve: {
                     postPromise: ['dates', function(dates) {
                         return dates.getAll();
@@ -92,7 +91,6 @@ app.controller('MainCtrl', [
             $scope.day = '';
             $scope.maxLimit = -5;
         };
-        $scope.userDate = $scope.year+$scope.month+$scope.day;
     }]);
 
 
