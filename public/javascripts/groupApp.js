@@ -71,13 +71,13 @@ app.controller('MainCtrl', [
     'dates',
     '$http',
     '$rootScope',
-    'articles',
+    // 'articles',
 
     
 
     function ($scope, dates, $http, $rootScope, articles) {
         $scope.dates = dates.dates;
-        $scope.articles = articles.articles;
+        // $scope.articles = articles.articles;
         
         $scope.addDate = function() {
             if (!$scope.year || $scope.year === '') {
@@ -100,50 +100,32 @@ app.controller('MainCtrl', [
             $scope.maxLimit = -5;
 
 
-var uYear = '2010';
-var uMonth = '10';
-var uDay = '10';
-var uDate = uYear+uMonth+uDay;
+        var uYear = '2010';
+        var uMonth = '10';
+        var uDay = '10';
+        var uDate = uYear+uMonth+uDay;
 
 
-var API_URL = 'https://api.nytimes.com/svc/search/v2/articlesearch.json?callback=svc_search_v2_articlesearch&begin_date='+uDate+'&end_date='+uDate+'&api-key=1e2c9c9b5e282dd8b3fb7a2ab7ee15e6%3A19%3A73419027';
-$http.get(API_URL).success(function(data) {
-$rootScope.resource = data;
-console.log($rootScope.resource); 
+        var API_URL = 'https://api.nytimes.com/svc/search/v2/articlesearch.json?callback=svc_search_v2_articlesearch&begin_date='+uDate+'&end_date='+uDate+'&api-key=1e2c9c9b5e282dd8b3fb7a2ab7ee15e6%3A19%3A73419027';
+        $http.get(API_URL).success(function(data) {
+        $rootScope.resource = data;
+        $scope.details = data;
+        console.log($rootScope.resource); 
     
-});
-    articles.create({
-        snippet: $rootScope.resource,
-    });
-    $scope.snipper ='';
-    
-
-};
-        }]);
- 
-
-    // articles.create({
-    //     snippet: $rootScope.resource
+        });
         
         
+//         articles.create({
+//             snippet: $scope.resource,
+//         });
+//         $scope.snippet ='';
+    
+
+// };
+        }}]);
     
 
 
-// app.controller('ResponseController', function($scope, $http) {
-
-//     function fetch() {
-//         $http.get("http://api.nytimes.com/svc/search/v2/articlesearch.json?callback=svc_search_v2_articlesearch&begin_date=" + $scope.search + "&end_date=" +
-//                 $scope.search + "&api-key=1e2c9c9b5e282dd8b3fb7a2ab7ee15e6%3A19%3A73419027")
-//             .success(function(response) {
-//                 $scope.details = response;
-//             });
-
-//     }
-//     if ($scope.search === undefined) {
-//         $scope.search = "20101010";
-//         fetch();
-//     };
-// });
 
 //Runs this console log when the webpage loads
 // app.run(['$http', '$rootScope',
@@ -157,48 +139,11 @@ console.log($rootScope.resource);
 //     }
 //   ]);
 
-// app.controller('getData', [
-//     '$http', '$rootScope',
-//     function($http, $rootScope) {
-//         console.log('Run');
-//         $http.get('https://api.nytimes.com/svc/search/v2/articlesearch.json?callback=svc_search_v2_articlesearch&begin_date=20101010&end_date=20101010&api-key=1e2c9c9b5e282dd8b3fb7a2ab7ee15e6%3A19%3A73419027')
-//         .success(function(data) {
-//           $rootScope.resource = data;
-//           console.log($rootScope.resource);
-//     })}]);
-
-
-// app.controller('DataController', ['$scope', 'Resource',
-//   function($scope, Resource) {
-//       $scope.
-//     console.log('controller');
-//     console.log(Resource);
-//   }
-// ]);
-// app.controller('DataCtrl', )  
-// app.controller('DataCtrl', function($scope,$http) {
-    
-//     if($scope.dates===undefined){
-//         $scope.dates = "20101010";
-//         fetch();
-//     }
-    
-    // function fetch(){
-    //             $http.get("http://api.nytimes.com/svc/search/v2/articlesearch.json?callback=svc_search_v2_articlesearch&begin_date=" + 20101010 + "&end_date=" +
-    //             20101010 + "&api-key=1e2c9c9b5e282dd8b3fb7a2ab7ee15e6%3A19%3A73419027")
-    //         .success(function(response) {
-    //             $scope.details = response;
-    //         });
-    // }
-    
-
-
-
 
 app.factory('dates', ['$http', function($http) {
     var o = {
         dates: [],
-        data:[],
+        articles:[],
     };
     // var p = {
     //     results:[]
@@ -212,7 +157,7 @@ app.factory('dates', ['$http', function($http) {
 
     o.create = function(date, api) {
         return $http.post('/Dates', date).success(function(data) {o.dates.push(data)}),
-        $http.post('/articles', api).success(function(data) {o.data.push(data)});
+        $http.post('/articles', api).success(function(data) {o.articles.push(data)});
     };
 
     return o;
