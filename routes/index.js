@@ -2,6 +2,7 @@ var express = require('express');
 var router = express.Router();
 var mongoose = require('mongoose');
 var Date1 = mongoose.model('Date');
+var Article1 = mongoose.model('Article');
 
 
 /* GET home page. */
@@ -28,20 +29,38 @@ router.post('/dates', function(req, res, next) {
   });
 });
 
-
-router.param('date', function(req, res, next, id) {
-  var query = Date1.findById(id);
-
-  query.exec(function (err, date){
-    if (err) { return next(err); }
-    if (!date) { return next(new Error('can\'t find post')); }
-
-    req.post = date;
-    return next();
+router.get('/articles', function (req, res, next) {
+  Article1.find(function(err, articles){
+    if(err){return next(err); }
+    
+    res.json(articles);
   });
 });
 
-router.get('/datess/:date', function(req, res, next) {
+router.post('/articles', function (req, res, next) {
+  var article = new Article1(req.body);
+  
+  article.save(function(err, article) {
+    if(err) {return next (err);}
+    res.json(article);
+  });
+  
+});
+
+
+// router.param('date', function(req, res, next, id) {
+//   var query = Date1.findById(id);
+
+//   query.exec(function (err, date){
+//     if (err) { return next(err); }
+//     if (!date) { return next(new Error('can\'t find post')); }
+
+//     req.post = date;
+//     return next();
+//   });
+// });
+
+router.get('/dates/:date', function(req, res, next) {
   req.post.populate(function(err, date) {
     if (err) { return next(err); }
 

@@ -6,6 +6,7 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var mongoose = require('mongoose');
 require('./models/Dates');
+require('./models/articles')
 
 var routes = require('./routes/index');
 var users = require('./routes/users');

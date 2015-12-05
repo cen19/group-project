@@ -3,7 +3,6 @@
 
 var app = angular.module('NYT_API', ['ui.router']);
 
-
 app.config([
 
     '$stateProvider',
@@ -72,10 +71,13 @@ app.controller('MainCtrl', [
     'dates',
     '$http',
     '$rootScope',
+    'articles',
+
     
 
-    function ($scope, dates, $http, $rootScope) {
+    function ($scope, dates, $http, $rootScope, articles) {
         $scope.dates = dates.dates;
+        $scope.articles = articles.articles;
         
         $scope.addDate = function() {
             if (!$scope.year || $scope.year === '') {
@@ -96,24 +98,54 @@ app.controller('MainCtrl', [
             $scope.month = '';
             $scope.day = '';
             $scope.maxLimit = -5;
-            $scope.userDate = $scope.year + $scope.month + $scope.day;
-            
-            var uYear = '2010';
-            var uMonth = '10';
-            var uDay = '10';
-            var uDate = uYear+uMonth+uDay;
-        
-        
-        var API_URL = 'https://api.nytimes.com/svc/search/v2/articlesearch.json?callback=svc_search_v2_articlesearch&begin_date='+uDate+'&end_date='+uDate+'&api-key=1e2c9c9b5e282dd8b3fb7a2ab7ee15e6%3A19%3A73419027';
-        $http.get(API_URL)
-        .success(function(data) {
-        $rootScope.resource = data;
-        console.log($rootScope.resource); });
-            
-        };
-    }]);
 
+
+var uYear = '2010';
+var uMonth = '10';
+var uDay = '10';
+var uDate = uYear+uMonth+uDay;
+
+
+var API_URL = 'https://api.nytimes.com/svc/search/v2/articlesearch.json?callback=svc_search_v2_articlesearch&begin_date='+uDate+'&end_date='+uDate+'&api-key=1e2c9c9b5e282dd8b3fb7a2ab7ee15e6%3A19%3A73419027';
+$http.get(API_URL).success(function(data) {
+$rootScope.resource = data;
+console.log($rootScope.resource); 
+    
+});
+    articles.create({
+        snippet: $rootScope.resource,
+    });
+    $scope.snipper ='';
+    
+
+};
+        }]);
+ 
+
+    // articles.create({
+    //     snippet: $rootScope.resource
         
+        
+    
+
+
+// app.controller('ResponseController', function($scope, $http) {
+
+//     function fetch() {
+//         $http.get("http://api.nytimes.com/svc/search/v2/articlesearch.json?callback=svc_search_v2_articlesearch&begin_date=" + $scope.search + "&end_date=" +
+//                 $scope.search + "&api-key=1e2c9c9b5e282dd8b3fb7a2ab7ee15e6%3A19%3A73419027")
+//             .success(function(response) {
+//                 $scope.details = response;
+//             });
+
+//     }
+//     if ($scope.search === undefined) {
+//         $scope.search = "20101010";
+//         fetch();
+//     };
+// });
+
+//Runs this console log when the webpage loads
 // app.run(['$http', '$rootScope',
 //     function($http, $rootScope) {
 //       console.log('Run');
@@ -134,6 +166,8 @@ app.controller('MainCtrl', [
 //           $rootScope.resource = data;
 //           console.log($rootScope.resource);
 //     })}]);
+
+
 // app.controller('DataController', ['$scope', 'Resource',
 //   function($scope, Resource) {
 //       $scope.
@@ -159,74 +193,45 @@ app.controller('MainCtrl', [
     
 
 
-// uses AngularJS's $http service
-// Results.controller('ResultsController', function($scope, $http) {
-
-//     function fetch() {
-        // $http.get("http://api.nytimes.com/svc/search/v2/articlesearch.json?callback=svc_search_v2_articlesearch&begin_date=" + $scope.search + "&end_date=" +
-        //         $scope.search + "&api-key=1e2c9c9b5e282dd8b3fb7a2ab7ee15e6%3A19%3A73419027")
-        //     .success(function(response) {
-        //         $scope.details = response;
-            // });
-
-//         $http.get("http://www.omdbapi.com/?s=" + $scope.search)
-//             .success(function(response) {
-//                 $scope.related = response;
-//             });
-//     }
-//     if ($scope.search === undefined) {
-//         $scope.search = "20101010";
-//         fetch();
-
-//         var pendingTask;
-
-//         $scope.change = function() {
-//             if (pendingTask) {
-//                 clearTimeout(pendingTask);
-//             }
-//             pendingTask = setTimeout(fetch, 800);
-//         };
-
-
-//     };
-// });
-
 
 
 app.factory('dates', ['$http', function($http) {
     var o = {
-        dates: []
+        dates: [],
+        data:[],
     };
-    var p = {
-        data:[]
-    };
+    // var p = {
+    //     results:[]
+    // };
 
     o.getAll = function() {
-        return $http.get('/dates').success(function(data) {
-            angular.copy(data, o.dates);
-        });
-    };
-
-    o.create = function(date) {
-        return $http.post('/dates', date).success(function(data) {
-            o.dates.push(data);
-        });
-    };
+        return $http.get('/dates').success(function(data) {angular.copy(data, o.dates)}),
+        $http.get('https://api.nytimes.com/svc/search/v2/articlesearch.json?callback=svc_search_v2_articlesearch&begin_date=20101010&end_date=20101010&api-key=1e2c9c9b5e282dd8b3fb7a2ab7ee15e6%3A19%3A73419027').success(function(data) {angular.copy(data, o.data)});
+        };
     
-    p.create = function(api) {
-        return $http.post('/dates', api).success(function(data) {
-            p.data.push(data);
-        });
+
+    o.create = function(date, api) {
+        return $http.post('/Dates', date).success(function(data) {o.dates.push(data)}),
+        $http.post('/articles', api).success(function(data) {o.data.push(data)});
     };
 
-    // o.get = function(id) {
-    //     return $http.get('/dates/' + id).then(function(res) {
-    //         return res.data;
-    //     });
-    // };
     return o;
 
+
 }]);
+
+// app.factory('storingAPIdata', ['$http', function($http){
+    
+//     var data;
+//     $http.get(API_URL).success(function(store){
+//         data=store;
+//     });
+//     return{ 
+//         getData: function() {
+//             return data;
+//         }
+//     };
+// }]);
 
 
 // app.factory('MasterData', ['$rootScope', '$http', '$q', '$log', 
@@ -244,54 +249,7 @@ app.factory('dates', ['$http', function($http) {
 
 
 
-
+//API URL to be used
+//------------------
 //http://api.nytimes.com/svc/search/v2/articlesearch.json?callback=svc_search_v2_articlesearch&begin_date=20101010&end_date=20101010&api-key=1e2c9c9b5e282dd8b3fb7a2ab7ee15e6%3A19%3A73419027
-
-
-
-
-
-
-
-
-//chart testing section
-
-// google.load("visualization", "1.1", {packages:["table"]});
-// chart.controller('ChartController', ['$scope', '$http', function($scope, $http){
-// $http.get('api.nytimes.com/svc/search/v2/articlesearch.json?%20&fq=pub_date:(2010-10-10)&api-key=1e2c9c9b5e282dd8b3fb7a2ab7ee15e6:19:73419027').success(function(data){
-
-// var API_URL = "http://api.nytimes.com/svc/search/v2/articlesearch.json?%20&fq=pub_date:(2010-10-10)&api-key=1e2c9c9b5e282dd8b3fb7a2ab7ee15e6:19:73419027";
-// var dataArray = formatDataForView(data);
-
-//         var dataTable = new google.visualization.arrayToDataTable(dataArray, false);
-//         var displayTable = new googele.visualization.Table(document.getElementById('chart_div'));
-
-//         var options = {'title': 'DateOfEntry Articles'}
-//         displayTable.draw(dataTable, options);
-//     });  
-// }]);
-
-// function formatDataForView(data){
-//     var dataArray = [];
-
-//     for (var whatever in data[0]){
-//         dataArray.push(whatever);
-//     }
-//     return dataArray;
-// }
-
-// google.setOnLoadCallback(drawChart);
-
-//     function drawChart() {
-//       var jsonData = $.ajax({
-//           url: "API_URL",
-//           dataType: "json",
-//           async: false
-//           }).responseText;
-
-//         // Create our data table out of JSON data loaded from server.
-//       var data = new google.visualization.DataTable(jsonData);
-//       // Instantiate and draw our chart, passing in some options.
-//       var chart = new google.visualization.Table(document.getElementById('chart_div'));
-//       chart.draw(data, {width: 400, height: 240});
-//     }
+//==================
