@@ -3,6 +3,7 @@
 
 var app = angular.module('NYT_API', ['ui.router']);
 
+
 app.config([
 
     '$stateProvider',
@@ -13,6 +14,7 @@ app.config([
                 url: '/home',
                 templateUrl: '/home.html',
                 controller: ('MainCtrl'),
+                service: ('ArticleManager'),
                 resolve: {
                     postPromise: ['dates', function(dates) {
                         return dates.getAll();
@@ -34,37 +36,21 @@ app.config([
     }
 ]);
 
-// app.controller('dataController', function($scope, $http){
-//     var pendingTask;
-     
-//      if($scope.search === undefined){
-//       $scope.search = "20101010";
-//       fetch();
-//     }
 
-//     $scope.change = function(){
-//       if(pendingTask){
-//         clearTimeout(pendingTask);
-//       }
-//       pendingTask = setTimeout(fetch, 800);
-//     };
-
-//     function fetch(){
-//             $http.get("http://api.nytimes.com/svc/search/v2/articlesearch.json?callback=svc_search_v2_articlesearch&begin_date=20101010&end_date=20101010&api-key=1e2c9c9b5e282dd8b3fb7a2ab7ee15e6%3A19%3A73419027")
-//             .success(function(response) {
-//                 $scope.details = response;
+    
+// app.controller('articlesController', ['$scope', 'ArticleManager', function($scope, ArticleManager) {
+//         var limit = 20;
+//         $scope.loadJobs = function() {
+//             ArticleManager.getAll(limit).then(function(articles) {
+//                 $scope.jobs = article;
+//                 limit += 10;
 //             });
-//     }
+//         };
+ 
+//         $scope.loadArticles();
+//     }]);
 
-//     $scope.update = function(movie){
-//       $scope.search = movie.Title;
-//       $scope.change();
-//     };
 
-//     $scope.select = function(){
-//       this.setSelectionRange(0, this.value.length);
-//     };
-//   });
 
 app.controller('MainCtrl', [
     '$scope',
@@ -73,9 +59,7 @@ app.controller('MainCtrl', [
     '$rootScope',
     // 'articles',
 
-    
-
-    function ($scope, dates, $http, $rootScope, articles) {
+    function ($scope, dates, $http, $rootScope, articles, ArticleManager) {
         $scope.dates = dates.dates;
         // $scope.articles = articles.articles;
         
@@ -108,14 +92,61 @@ app.controller('MainCtrl', [
         $http.get(API_URL).success(function(data) {
         $rootScope.resource = data;
         console.log($rootScope.resource);
-        document.write(($rootScope.resource.response.object));
         });
-
-        };
         
-    }
-    ]
-    );
+        app.service('MainCtrl', ['$q', '$http', 'ArticleSearch', function($q, $http, Article) {
+        return {
+            getAll: function(limit) {
+                var deferred = $q.defer();
+ 
+                $http.get(API_URL).success(function(data) {
+                    var articles = [];
+                    for (var i = 0; i < data.objects.length; i ++) {
+                        articles.push(new Article(data.objects[i]));
+                    }
+                    deferred.resolve(articles);
+                });
+ 
+                return deferred.promise;
+            }
+        };
+    }]);
+
+  
+        app.factory('Article', function () {
+        function Article(data) {
+        for (attr in data) {
+            if (data.hasOwnProperty(attr))
+                    this[attr] = data[attr];
+            }
+        }
+ 
+        Article.prototype.getResult = function() {
+            if (this.status == 'complete') {
+                if (this.passed === null) return "Finished";
+                else if (this.passed === true) return "Pass";
+                else if (this.passed === false) return "Fail";
+            }
+            else return "Running";
+        };
+ 
+        return Article;
+        });
+        
+        app.controller('articlecController', ['$scope', 'ArticleManager', function ($scope, ArticleManager) {
+        var limit = 20;
+        $scope.loadArticles = function() {
+                
+                ArticleManager.getAll(limit).then(function(articles) {
+                $scope.article = articles;
+                limit += 10;
+        });
+            
+        };
+
+        $scope.loadArticles();
+        }]);
+}}]);
     
 //Runs this console log when the webpage loads
 // app.run(['$http', '$rootScope',
@@ -129,6 +160,24 @@ app.controller('MainCtrl', [
 //     }
 //   ]);
 
+//service to get the articles
+// app.service('MainCtrl', ['$q', '$http', 'ArticleSearch', function($q, $http, Article) {
+//         return {
+//             getAll: function(limit) {
+//                 var deferred = $q.defer();
+ 
+//                 $http.get(API_URL).success(function(data) {
+//                     var articles = [];
+//                     for (var i = 0; i < data.objects.length; i ++) {
+//                         articles.push(new Article(data.objects[i]));
+//                     }
+//                     deferred.resolve(articles);
+//                 });
+ 
+//                 return deferred.promise;
+//             }
+//         };
+//     }]);
 
 app.factory('dates', ['$http', function($http) {
     var o = {
@@ -141,7 +190,7 @@ app.factory('dates', ['$http', function($http) {
 
     o.getAll = function() {
         return $http.get('/dates').success(function(data) {angular.copy(data, o.dates)}),
-        $http.get('https://api.nytimes.com/svc/search/v2/articlesearch.json?callback=svc_search_v2_articlesearch&begin_date=20101010&end_date=20101010&api-key=1e2c9c9b5e282dd8b3fb7a2ab7ee15e6%3A19%3A73419027').success(function(data) {angular.copy(data, o.data)});
+        $http.get('https://api.nytimes.com/svc/search/v2/articlesearch.json?callback=svc_search_v2_articlesearch&begin_date='+'20101010'+'&end_date='+'20101010'+'&api-key=1e2c9c9b5e282dd8b3fb7a2ab7ee15e6%3A19%3A73419027').success(function(data) {angular.copy(data, o.data)});
         };
     
 
@@ -151,39 +200,65 @@ app.factory('dates', ['$http', function($http) {
     };
 
     return o;
-
-
-}]);
-
-app.factory('articles', ['$http', function($http){
-    var o = {
-        articles: [],
-    };
     
-    var data;
-    $http.get(API_URL).success(function(store){
-        data=store;
-    });
-    return{ 
-        getData: function() {
-            return data;
-        }
-    };
+
+
 }]);
 
 
-app.factory('MasterData', ['$rootScope', '$http', '$q', '$log', 
-    function($rootScope, $http, $q, $log) {
+// //factory code (articles)
+// app.factory('Article', function() {
+//         function Article(data) {
+//             for (attr in data) {
+//                 if (data.hasOwnProperty(attr))
+//                     this[attr] = data[attr];
+//             }
+//         }
+ 
+//         Article.prototype.getResult = function() {
+//             if (this.status == 'complete') {
+//                 if (this.passed === null) return "Finished";
+//                 else if (this.passed === true) return "Pass";
+//                 else if (this.passed === false) return "Fail";
+//             }
+//             else return "Running";
+//         };
+ 
+//         return Article;
+//     });
+    
 
-    var responseData;
-    $http.get('http://api.nytimes.com/svc/search/v2/articlesearch.json?callback=svc_search_v2_articlesearch&begin_date=20101010&end_date=20101010&api-key=1e2c9c9b5e282dd8b3fb7a2ab7ee15e6%3A19%3A73419027').then(function (response) {
-        responseData = response.data;
-        console.log(response.data);
-    });
 
-    return responseData;
+// app.factory('articles', ['$http', function($http){
+//     var o = {
+//         articles: [],
+//     };
+    
+//     var data;
+//     $http.get(API_URL).success(function(store){
+//         data=store;
+//     });
+//     return{ 
+//         getData: function() {
+//             return data;
+//         }
+//     };
+// }
+// ]);
 
-}]);
+
+// app.factory('MasterData', ['$rootScope', '$http', '$q', '$log', 
+//     function($rootScope, $http, $q, $log) {
+
+//     var responseData;
+//     $http.get('http://api.nytimes.com/svc/search/v2/articlesearch.json?callback=svc_search_v2_articlesearch&begin_date=20101010&end_date=20101010&api-key=1e2c9c9b5e282dd8b3fb7a2ab7ee15e6%3A19%3A73419027').then(function (response) {
+//         responseData = response.data;
+//         console.log(response.data);
+//     });
+
+//     return responseData;
+
+// }]);
 
 
 
