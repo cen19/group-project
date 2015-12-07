@@ -4,6 +4,7 @@
 var app = angular.module('NYT_API', ['ui.router']);
 google.load("visualization", "1.1", {packages:["table"]});
 
+
 app.config([
 
     '$stateProvider',
@@ -77,26 +78,53 @@ app.controller('MainCtrl', [
         var API_URL = 'https://api.nytimes.com/svc/search/v2/articlesearch.json?callback=svc_search_v2_articlesearch&begin_date='+uDate+'&end_date='+uDate+'&api-key=1e2c9c9b5e282dd8b3fb7a2ab7ee15e6%3A19%3A73419027';
         
         $http.get(API_URL).success(function(data) {
-        $scope.resource = data;
-        console.log($scope.resource);
+        $scope.resources = data;
+        console.log($scope.resources);
         });
-        
-        function drawChart() {
-        var articleData = $http.get(API_URL).success(function(data){
-        articleData = data;
-          
-        // Create our data table out of JSON data loaded from server.
-        var getArticles = new google.visualization.DataTable(articleData);
 
-        // Instantiate and draw our chart, passing in some options.
-        var chart = new google.visualization.TableChart(document.getElementById('chart_div'));
-        chart.draw(getArticles);
-            
-        });
+        google.setOnLoadCallback(drawTable);
+        function drawTable () {
+        var data = new google.visualization.DataTable($scope.resource);
+        data.addColumn('string', 'Doc');
+        
+        var table = new google.visualization.TableChart(document.getElementById('table_div'));
+  
+
+        table.draw(table);
         }
-        
-    };
-        
+        };
+
+//other 
+//         function drawTable() {
+//             var jsonData = $.ajax({
+//                 url : API_URL,
+//                 dataType: "json",
+//                 async: false
+//             }).responseText;
+          
+//         // Create our data table out of JSON data loaded from server.
+//         var getArticles = new google.visualization.DataTable(jsonData);
+
+//         // Instantiate and draw our chart, passing in some options.
+//         var table = new google.visualization.TableChart(document.getElementById('table_div'));
+//         table.draw(getArticles);
+    //     function drawTable() {
+
+    //     var data = new google.visualization.DataTable();
+    //     data.addColumn('string', 'Name');
+    //     data.addColumn('number', 'Salary');
+    //     data.addColumn('boolean', 'Full Time Employee');
+    //     data.addRows([
+    //       ['Mike',  {v: 10000, f: '$10,000'}, true],
+    //       ['Jim',   {v:8000,   f: '$8,000'},  false],
+    //       ['Alice', {v: 12500, f: '$12,500'}, true],
+    //       ['Bob',   {v: 7000,  f: '$7,000'},  true]
+    //     ]);
+
+    //     var table = new google.visualization.Table(document.getElementById('table_div'));
+
+    //     table.draw(data, {showRowNumber: true, width: '100%', height: '100%'});
+    //   }
     }]);
   
     //     app.factory('Article', function () {

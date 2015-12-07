@@ -10,7 +10,6 @@
     <script type="text/javascript" src="https://www.google.com/jsapi"></script>
     <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
     <script src="/javascripts/groupApp.js"></script>
-
     </head>
     
     
@@ -58,18 +57,21 @@
        </form>
         
         <br><br><br>
-        
-        <div ng-app="NYT_API">
-            <div ng-controller="MainCtrl">
-                <div id="chart_div">
-                </div>
-              </div>
-           </div>
+        <table>
+        <tr>
+        <th>Web Url</th>
+        <th>Snippet</th>
+        </tr>
+        <tr ng-repeat = "resource in resourses">
+        <td>{{resource.web_url}}</td>
+        <td>{{resources.snippet}}</td>
+        </tr>
+        <table>
         
         <div>
         Table with Results go here<br>
         <br>
-        {{resource}}
+        {{resources}}
         </div>
         
        </script>
