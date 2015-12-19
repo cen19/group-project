@@ -1,5 +1,18 @@
 <!DOCTYPE html>
 <html>
+    <style>
+table, th , td  {
+  border: 1px solid grey;
+  border-collapse: collapse;
+  padding: 7px;
+}
+table tr:nth-child(odd)	{
+  background-color: #f1f1f1;
+}
+table tr:nth-child(even) {
+  background-color: #ffffff;
+}
+</style>
 <head>
     <title>group-app-New-York-Times-API</title>
 <meta charset=utf-8>
@@ -57,26 +70,22 @@
        </form>
         
         <br><br><br>
+
         <table>
-        <tr>
-        <th>Web Url</th>
-        <th>Snippet</th>
+                <th ng-repeat= "header in headers">
+        {{headers[$index]}} 
+    </th>
+            <tr ng-repeat="article in articles | limitTo: -10">
+            <td title="'Headline'">{{article.headline.main}}</td>
+            <td data-title="'Snippet'">{{article.snippet}}</td>
+            <td data-title="'URL'"><a ng-href={{article.web_url}}> {{article.web_url}}<a></td>
         </tr>
-        <tr ng-repeat = "resource in resourses">
-        <td>{{resource.web_url}}</td>
-        <td>{{resources.snippet}}</td>
-        </tr>
-        <table>
+         </table>
+
         
-        <div>
-        Table with Results go here<br>
-        <br>
-        {{resources}}
-        </div>
-        
+     
        </script>
     
-    <!--<script type = "text/ng-template" id="/articles.html"-->
 
 </body>
 </html>

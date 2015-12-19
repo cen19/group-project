@@ -2,7 +2,7 @@
 //Back end controls
 
 var app = angular.module('NYT_API', ['ui.router']);
-google.load("visualization", "1.1", {packages:["table"]});
+google.load("visualization", "1.1", {packages:['table']});
 
 
 app.config([
@@ -22,24 +22,10 @@ app.config([
                     }]
                 }
             });
-            // .state('dates', {
-            //     url: '/dates/{id}',
-            //     templateUrl: '/dates.html',
-            //     controller: 'DatesCtrl',
-            //     resolve: {
-            //         post: ['$stateParams', 'dates', function($stateParams, dates) {
-            //             return dates.get($stateParams.id);
-            //         }]
-            //     }
-            // });
 
         $urlRouterProvider.otherwise('home');
     }
 ]);
-
-
-
-
 
 app.controller('MainCtrl', [
     '$scope',
@@ -78,122 +64,41 @@ app.controller('MainCtrl', [
         var API_URL = 'https://api.nytimes.com/svc/search/v2/articlesearch.json?callback=svc_search_v2_articlesearch&begin_date='+uDate+'&end_date='+uDate+'&api-key=1e2c9c9b5e282dd8b3fb7a2ab7ee15e6%3A19%3A73419027';
         
         $http.get(API_URL).success(function(data) {
-        $scope.resources = data;
-        console.log($scope.resources);
-        });
-
-        google.setOnLoadCallback(drawTable);
-        function drawTable () {
-        var data = new google.visualization.DataTable($scope.resource);
-        data.addColumn('string', 'Doc');
+         $scope.resources = data.response.docs;
+          console.log($scope.resources);
         
-        var table = new google.visualization.TableChart(document.getElementById('table_div'));
-  
+        $scope.articles = $scope.resources;
+        $scope.headers = ['Title', 'Snippet', 'URL'];
+       angular.forEach($scope.articles, function (article) {
+         $scope.results.push({
+           headline: article.headline.main,
+           url: article.web_url,
+           snippet: article.snippet
+         });
+       }
+       );
+            });
+        
 
-        table.draw(table);
-        }
-        };
 
-//other 
-//         function drawTable() {
-//             var jsonData = $.ajax({
-//                 url : API_URL,
-//                 dataType: "json",
-//                 async: false
-//             }).responseText;
-          
-//         // Create our data table out of JSON data loaded from server.
-//         var getArticles = new google.visualization.DataTable(jsonData);
+        };  
 
-//         // Instantiate and draw our chart, passing in some options.
-//         var table = new google.visualization.TableChart(document.getElementById('table_div'));
-//         table.draw(getArticles);
-    //     function drawTable() {
-
-    //     var data = new google.visualization.DataTable();
-    //     data.addColumn('string', 'Name');
-    //     data.addColumn('number', 'Salary');
-    //     data.addColumn('boolean', 'Full Time Employee');
-    //     data.addRows([
-    //       ['Mike',  {v: 10000, f: '$10,000'}, true],
-    //       ['Jim',   {v:8000,   f: '$8,000'},  false],
-    //       ['Alice', {v: 12500, f: '$12,500'}, true],
-    //       ['Bob',   {v: 7000,  f: '$7,000'},  true]
-    //     ]);
-
-    //     var table = new google.visualization.Table(document.getElementById('table_div'));
-
-    //     table.draw(data, {showRowNumber: true, width: '100%', height: '100%'});
-    //   }
     }]);
-  
-    //     app.factory('Article', function () {
-    //     function Article(data) {
-    //     for (attr in data) {
-    //         if (data.hasOwnProperty(attr))
-    //                 this[attr] = data[attr];
-    //         }
-    //     }
- 
-    //     Article.prototype.getResult = function() {
-    //         if (this.status == 'complete') {
-    //             if (this.passed === null) return "Finished";
-    //             else if (this.passed === true) return "Pass";
-    //             else if (this.passed === false) return "Fail";
-    //         }
-    //         else return "Running";
-    //     };
- 
-    //     return Article;
-    //     });
-        
-    //     app.controller('articlecController', ['$scope', 'ArticleManager', function ($scope, ArticleManager) {
-    //     var limit = 20;
-    //     $scope.loadArticles = function() {
-                
-    //             ArticleManager.getAll(limit).then(function(articles) {
-    //             $scope.article = articles;
-    //             limit += 10;
-    //     });
-            
-    //     };
 
-    //     $scope.loadArticles();
-    //     }]);
-
-    
-//Runs this console log when the webpage loads
-// app.run(['$http', '$rootScope',
-//     function($http, $rootScope) {
-//       console.log('Run');
-//       $http.get('https://api.nytimes.com/svc/search/v2/articlesearch.json?callback=svc_search_v2_articlesearch&begin_date=20101010&end_date=20101010&api-key=1e2c9c9b5e282dd8b3fb7a2ab7ee15e6%3A19%3A73419027')
-//         .success(function(data) {
-//           $rootScope.resource = data;
-//           console.log($rootScope.resource);
-//         });
-//     }
-//   ]);
-
-
-//https://api.nytimes.com/svc/search/v2/articlesearch.json?callback=svc_search_v2_articlesearch&begin_date='+'20101010'+'&end_date='+'20101010'+'&api-key=1e2c9c9b5e282dd8b3fb7a2ab7ee15e6%3A19%3A73419027
 app.factory('dates', ['$http', function($http) {
     var o = {
         dates: [],
         articles:[],
     };
-    // var p = {
-    //     results:[]
-    // };
+
 
     o.getAll = function() {
-        return $http.get('/dates').success(function(data) {angular.copy(data, o.dates)}),
-        $http.get('').success(function(data) {angular.copy(data, o.data)});
+        return $http.get('/dates').success(function(data) {angular.copy(data, o.dates)});
         };
     
 
     o.create = function(date, api) {
-        return $http.post('/Dates', date).success(function(data) {o.dates.push(data)}),
-        $http.post('/articles', api).success(function(data) {o.articles.push(data)});
+        return $http.post('/Dates', date).success(function(data) {o.dates.push(data)});
     };
 
     return o;
@@ -201,8 +106,6 @@ app.factory('dates', ['$http', function($http) {
 
 
 }]);
-
-
 
 
 //API URL to be used
